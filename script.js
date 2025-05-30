@@ -14,7 +14,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Helper function to format currency ---
     const formatCurrency = (amount) => {
-        if (typeof amount !== 'number') return '$ N/A'; // Handle non-numeric values gracefully
+        if (typeof amount !== 'number') {
+            // Attempt to parse if it's a string that looks like a number
+            const parsedAmount = parseFloat(amount);
+            if (!isNaN(parsedAmount)) {
+                amount = parsedAmount;
+            } else {
+                return '$ N/A'; // Handle non-numeric values gracefully
+            }
+        }
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: 'USD',
@@ -73,13 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // The loans:search API typically returns individual loan accounts.
             // To get the actual funding source balance, you would likely need to
             // call a different Mambu API endpoint (e.g., for a deposit account).
-            // For now, we'll hardcode or sum values as a proxy.
-            // Let's hardcode to match the screenshot for visual consistency:
-            remainingBalanceElement.textContent = formatCurrency(225000.00); // Matches screenshot
-            // Or, if you wanted to sum all loan amounts as a proxy (not accurate for 'remaining balance'):
-            // const totalLoanAmount = loans.reduce((sum, loan) => sum + (loan.loanAmount?.principalAmount || 0), 0);
-            // remainingBalanceElement.textContent = formatCurrency(totalLoanAmount);
-
+            // For this example, we'll hardcode to match the screenshot for visual consistency:
+            remainingBalanceElement.textContent = formatCurrency(225000.00); // Matches screenshot value
 
             // --- Populate Loan Details Table ---
             loanDetailsTableBody.innerHTML = ''; // Clear existing rows
@@ -87,20 +90,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 loans.forEach(loan => {
                     const row = document.createElement('tr');
 
-                    // Map Mambu loan account fields to your table columns
-                    // Note: Some fields like 'Customer Name' might require additional API calls
-                    // or assumptions if they are not directly available on the loan object.
-                    const disbursementDate = loan.disbursementDetails?.activeDisbursementDate || 'N/A';
+                    // --- MAPPING API RESPONSE TO SCREEN FIELDS ---
+                    // Using optional chaining (?.) for nested properties to prevent errors if they are missing
+                    const disbursementDate = loan.disbursementDetails?.disbursementDate || 'N/A';
                     const fundedLoanId = loan.id || 'N/A';
-                    const productType = loan.productTypeKey || 'N/A'; // Or loan.productName if available
-                    const customerName = loan.accountHolderName || 'N/A'; // Mambu typically provides accountHolderName for loans
-                    const customerId = loan.accountHolderKey || 'N/A';
+                    const productType = loan.loanName || 'N/A'; // Using loanName as per request
+                    const customerName = loan.accountHolderKey || 'N/A'; // Using accountHolderKey as per request (often accountHolderName for display)
+                    const customerId = loan.accountHolderKey || 'N/A'; // Using accountHolderKey as per request
                     const accountState = loan.accountState || 'N/A';
-                    const loanAmount = loan.loanAmount?.principalAmount || 0;
-                    const totalDisbursed = loan.disbursementDetails?.totalDisbursedAmount || 0;
-                    const remainingToDisburse = (loan.disbursementDetails?.expectedDisbursementAmount || 0) - (loan.disbursementDetails?.totalDisbursedAmount || 0);
-                    const loanPrincipalBalance = loan.loanAmount?.principalBalance || 0;
-                    const totalPrincipalPaid = loan.loanAmount?.totalPaidPrincipal || 0;
+
+                    // For loanAmount, Mambu typically has loanAmount.principalAmount.
+                    // Assuming loan.loanAmount refers to the object and we need the principalAmount from it.
+                    const loanAmount = loan.loanAmount|| 0;
+
+                    // WARNING: totalDisbursed mapped to loan.loanAmount.
+                    // This is unusual, as totalDisbursed typically comes from loan.disbursementDetails.totalDisbursedAmount.
+                    // Implementing as requested, but verify this is the intended data point.
+                    const totalDisbursed = loan.loanAmount|| 0; // Mapped to loan.loanAmount as requested
+
+                    const remainingToDisburse = 0; // Explicitly set to 0 as per request
+
+                    // Assuming loan.balances is an object containing principalBalance and principalPaid
+                    const loanPrincipalBalance = loan.balances?.principalBalance || 0;
+                    const totalPrincipalPaid = loan.balances?.principalPaid || 0;
 
 
                     row.innerHTML = `
