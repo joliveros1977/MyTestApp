@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // !!! CRITICAL SECURITY WARNING !!!
     // DO NOT expose your Mambu API Key directly in client-side code for production.
     // Use a secure backend proxy (e.g., Serverless Function) for real applications.
-    const MAMBU_API_KEY = 'INdEv59XSzKtrQnVnsuw0UshnlZX1ffZ'; // <--- REPLACE WITH YOUR ACTUAL API KEY
+    const MAMBU_API_KEY = ''; // <--- REPLACE WITH YOUR ACTUAL API KEY
     const MAMBU_API_URL = 'https://mbujesse.sandbox.mambu.com/api/loans:search'; // Your specified API endpoint
     const FUNDING_ACCOUNT_ID = 'cdb-funding'; // <--- REPLACE WITH THE ACTUAL FUNDING ACCOUNT ID
 
