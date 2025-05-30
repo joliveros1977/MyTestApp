@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(MAMBU_API_URL, {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/vnd.mambu.v1+json', // Mambu's preferred Accept header
+                    'Accept': 'application/vnd.mambu.v2+json', // Mambu's API v2 header
                     'Content-Type': 'application/json',
                     'apikey': MAMBU_API_KEY // !!! INSECURE FOR PRODUCTION CLIENT-SIDE CODE !!!
                 },
