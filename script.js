@@ -56,7 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Accept': 'application/vnd.mambu.v2+json', // Mambu's API v2 header
                     'Content-Type': 'application/json',
-                    'apikey': MAMBU_API_KEY // !!! INSECURE FOR PRODUCTION CLIENT-SIDE CODE !!!
+                    'apikey': MAMBU_API_KEY, // !!! INSECURE FOR PRODUCTION CLIENT-SIDE CODE !!!
+                    'Access-Control-Allow-Origin': '*'
                 },
                 body: JSON.stringify(requestBody)
             });
