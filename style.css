@@ -4,7 +4,7 @@ html, body {
     width: 100%;  /* Make HTML and Body take full viewport width */
     margin: 0;    /* Remove default body margins */
     padding: 0;   /* Remove default body padding */
-    overflow: hidden; /* Prevent body scrollbars, allowing the container to handle scrolling */
+    overflow: hidden; /* Prevent body scrollbars, allowing the container or its children to handle scrolling */
     background-color: #f2f2f2; /* Light grey background */
     color: #333;
     font-family: Arial, sans-serif;
@@ -25,12 +25,9 @@ html, body {
     box-shadow: none;       /* Remove box-shadow to blend with edges */
     padding: 20px;          /* Maintain internal padding for content spacing */
 
-    /* IMPORTANT: Add scrolling ability */
-    overflow: auto; /* Adds scrollbars (horizontal and/or vertical) only when content overflows */
-    /* Alternatively, you could use:
-       overflow-x: auto; for horizontal only
-       overflow-y: auto; for vertical only
-    */
+    /* IMPORTANT: Handle vertical scrolling for the main content if it overflows */
+    overflow-y: auto;
+    /* Removed overflow: auto; (or overflow-x) from here because .table-responsive will handle horizontal table scrolling */
 }
 
 
@@ -38,7 +35,7 @@ html, body {
 .remaining-balance-container {
     text-align: center;
     margin-top: 30px;
-    margin-bottom: 40px;
+    margin-bottom: 40px; /* Add some space below the balance before the table */
 }
 
 .remaining-balance-label {
@@ -53,11 +50,20 @@ html, body {
     color: #339933; /* Green color for balance */
 }
 
+/* NEW CSS: Responsive Table Wrapper */
+.table-responsive {
+    /* This makes the content inside (your table) scroll horizontally if it's wider than this div */
+    overflow-x: auto;
+    /* Add some margin if needed, e.g., margin-bottom: 20px; */
+}
+
+
 /* Loan Details Table */
 .loan-details-table {
-    width: 100%;
+    /* The table itself should be as wide as its content needs to be,
+       and the .table-responsive parent will handle the horizontal scroll. */
+    width: 100%; /* Still useful to make it try to fill space, but content can push it wider */
     border-collapse: collapse;
-    margin-top: 20px;
 }
 
 .loan-details-table th,
@@ -66,13 +72,13 @@ html, body {
     padding: 10px 12px;
     text-align: left;
     font-size: 13px;
+    white-space: nowrap; /* Keep this to prevent text wrapping within cells, forcing table wider */
 }
 
 .loan-details-table th {
     background-color: #f8f8f8;
     font-weight: bold;
     color: #666;
-    white-space: nowrap; /* Prevent wrapping for headers */
 }
 
 .loan-details-table tbody tr:nth-child(even) {
