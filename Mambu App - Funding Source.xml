@@ -1,0 +1,11 @@
+<app>
+     <id>fundingsource</id>
+     <name>Funding Source App</name>
+     <provider>GitHub</provider>
+     <description>An application to view all loans funded from a funding source (deposit account) and manage disbursements for these loans.</description>
+     <extensionpoint>
+          <location>DEPOSIT_ACCOUNT_VIEW</location>
+          <label>Funding</label>
+          <url>https://joliveros1977.github.io/MyTestApp/</url>
+     </extensionpoint>
+</app>
