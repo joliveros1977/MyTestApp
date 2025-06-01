@@ -1,154 +1,236 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const remainingBalanceElement = document.getElementById('remainingBalance');
-    const loanDetailsTableBody = document.getElementById('loanDetailsTableBody');
-    const loadingMessage = document.getElementById('loadingMessage');
-    const errorMessage = document.getElementById('errorMessage');
+document.addEventListener("DOMContentLoaded", () => {
+  const remainingBalanceElement = document.getElementById("remainingBalance");
+  const loanDetailsTableBody = document.getElementById("loanDetailsTableBody");
+  const loadingMessage = document.getElementById("loadingMessage");
+  const errorMessage = document.getElementById("errorMessage");
 
-    // --- Configuration for Mambu API Request ---
-    // !!! CRITICAL SECURITY WARNING !!!
-    // DO NOT expose your Mambu API Key directly in client-side code for production.
-    // Use a secure backend proxy (e.g., Serverless Function) for real applications.
-    const MAMBU_API_KEY = ''; // <--- REPLACE WITH YOUR ACTUAL API KEY
-    const MAMBU_API_URL = 'https://mbujesse.sandbox.mambu.com/api/loans:search'; // Your specified API endpoint
-    const FUNDING_ACCOUNT_ID = 'cdb-funding'; // <--- REPLACE WITH THE ACTUAL FUNDING ACCOUNT ID
+  // --- Configuration for Proxy API Request ---
+  const PROXY_API_URL = "http://localhost:3000/api/mambu-loans-search";
+  const PROXY_CHANGE_STATE_URL = "http://localhost:3000/api/mambu-loan-change-state"; // Proxy API for changing loan state
+  const FUNDING_ACCOUNT_ID = "cdb-funding";
 
-    // --- Helper function to format currency ---
-    const formatCurrency = (amount) => {
-        if (typeof amount !== 'number') {
-            // Attempt to parse if it's a string that looks like a number
-            const parsedAmount = parseFloat(amount);
-            if (!isNaN(parsedAmount)) {
-                amount = parsedAmount;
-            } else {
-                return '$ N/A'; // Handle non-numeric values gracefully
-            }
-        }
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(amount);
-    };
+  // --- Mambu Base URL for Native Screen ---
+  const MAMBU_NATIVE_BASE_URL = "https://mbujesse.sandbox.mambu.com/#"; // Base URL for Mambu UI
 
-    // --- Function to fetch data from Mambu API ---
-    async function fetchMambuLoans() {
-        loadingMessage.style.display = 'block'; // Show loading message
-        errorMessage.style.display = 'none';    // Hide any previous error message
+  // --- Helper function to format currency ---
+  const formatCurrency = (amount) => {
+    if (typeof amount !== "number") {
+      const parsedAmount = parseFloat(amount);
+      if (!isNaN(parsedAmount)) {
+        amount = parsedAmount;
+      } else {
+        return "$ N/A";
+      }
+    }
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
 
-        try {
-            const requestBody = {
-                "filterCriteria": [
-                    {
-                        "field": "_fundingsource.Source_Account", // Custom field for funding source
-                        "operator": "EQUALS_CASE_SENSITIVE",
-                        "value": FUNDING_ACCOUNT_ID
-                    }
-                ],
-                "sortingCriteria": {
-                    "field": "id",
-                    "order": "ASC"
-                }
-            };
-
-            const response = await fetch(MAMBU_API_URL, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/vnd.mambu.v2+json', // Mambu's API v2 header
-                    'Content-Type': 'application/json',
-                    'apikey': MAMBU_API_KEY, // !!! INSECURE FOR PRODUCTION CLIENT-SIDE CODE !!!
-                    'Access-Control-Allow-Origin': '*'
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            // Check if the request was successful (status code 200-299)
-            if (!response.ok) {
-                // Try to parse error message from Mambu if available
-                let errorData;
-                try {
-                    errorData = await response.json();
-                } catch (e) {
-                    errorData = { message: 'Could not parse error response.' };
-                }
-                throw new Error(`Mambu API error! Status: ${response.status} - ${errorData.message || response.statusText}`);
-            }
-
-            const loans = await response.json(); // Mambu loans:search returns an array of loan accounts
-            console.log('Mambu Loan Data received:', loans); // Log data for debugging
-
-            // --- Populate Remaining Balance ---
-            // Note: This 'Remaining Balance' is for the Funding Source Account.
-            // The loans:search API typically returns individual loan accounts.
-            // To get the actual funding source balance, you would likely need to
-            // call a different Mambu API endpoint (e.g., for a deposit account).
-            // For this example, we'll hardcode to match the screenshot for visual consistency:
-            remainingBalanceElement.textContent = formatCurrency(225000.00); // Matches screenshot value
-
-            // --- Populate Loan Details Table ---
-            loanDetailsTableBody.innerHTML = ''; // Clear existing rows
-            if (loans && Array.isArray(loans) && loans.length > 0) {
-                loans.forEach(loan => {
-                    const row = document.createElement('tr');
-
-                    // --- MAPPING API RESPONSE TO SCREEN FIELDS ---
-                    // Using optional chaining (?.) for nested properties to prevent errors if they are missing
-                    const disbursementDate = loan.disbursementDetails?.disbursementDate || 'N/A';
-                    const fundedLoanId = loan.id || 'N/A';
-                    const productType = loan.loanName || 'N/A'; // Using loanName as per request
-                    const customerName = loan.accountHolderKey || 'N/A'; // Using accountHolderKey as per request (often accountHolderName for display)
-                    const customerId = loan.accountHolderKey || 'N/A'; // Using accountHolderKey as per request
-                    const accountState = loan.accountState || 'N/A';
-
-                    // For loanAmount, Mambu typically has loanAmount.principalAmount.
-                    // Assuming loan.loanAmount refers to the object and we need the principalAmount from it.
-                    const loanAmount = loan.loanAmount|| 0;
-
-                    // WARNING: totalDisbursed mapped to loan.loanAmount.
-                    // This is unusual, as totalDisbursed typically comes from loan.disbursementDetails.totalDisbursedAmount.
-                    // Implementing as requested, but verify this is the intended data point.
-                    const totalDisbursed = loan.loanAmount|| 0; // Mapped to loan.loanAmount as requested
-
-                    const remainingToDisburse = 0; // Explicitly set to 0 as per request
-
-                    // Assuming loan.balances is an object containing principalBalance and principalPaid
-                    const loanPrincipalBalance = loan.balances?.principalBalance || 0;
-                    const totalPrincipalPaid = loan.balances?.principalPaid || 0;
-
-
-                    row.innerHTML = `
-                        <td>${disbursementDate}</td>
-                        <td>${fundedLoanId}</td>
-                        <td>${productType}</td>
-                        <td>${customerName}</td>
-                        <td>${customerId}</td>
-                        <td>${accountState}</td>
-                        <td>${formatCurrency(loanAmount)}</td>
-                        <td>${formatCurrency(totalDisbursed)}</td>
-                        <td>${formatCurrency(remainingToDisbburse)}</td>
-                        <td>${formatCurrency(loanPrincipalBalance)}</td>
-                        <td>${formatCurrency(totalPrincipalPaid)}</td>
-                    `;
-                    loanDetailsTableBody.appendChild(row);
-                });
-            } else {
-                // No data or empty array
-                const noDataRow = document.createElement('tr');
-                noDataRow.innerHTML = `<td colspan="11" style="text-align: center;">No loan details found for this funding source.</td>`;
-                loanDetailsTableBody.appendChild(noDataRow);
-            }
-
-        } catch (error) {
-            console.error('Error fetching Mambu data:', error);
-            errorMessage.textContent = `Failed to load data: ${error.message}. Check console for details.`;
-            errorMessage.style.display = 'block';
-            remainingBalanceElement.textContent = '$ ERROR'; // Indicate error
-            loanDetailsTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: red;">Error loading loan details.</td></tr>`;
-        } finally {
-            loadingMessage.style.display = 'none'; // Hide loading message regardless of success or failure
-        }
+  // --- Function to handle loan approval ---
+  async function handleApproveLoan(loanId, buttonElement) {
+    if (!confirm(`Are you sure you want to APPROVE this loan?`)) {
+      return; // User cancelled
     }
 
-    // --- Call the function to fetch data when the page loads ---
-    fetchMambuLoans();
+    // Disable the button and change text while processing
+    buttonElement.disabled = true;
+    buttonElement.textContent = "Approving...";
+
+    try {
+      const response = await fetch(PROXY_CHANGE_STATE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          loanAccountId: loanId, // Send the loan encoded key to the proxy
+          action: "APPROVE",
+          notes: "Loan approved via Mambu App",
+        }),
+      });
+
+      if (!response.ok) {
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          errorData = { message: "Could not parse error response from proxy." };
+        }
+        throw new Error(
+          `Proxy error! Status: ${response.status} - ${errorData.error || errorData.message || response.statusText}`
+        );
+      }
+
+      const result = await response.json();
+      console.log("Loan approval successful;", result);
+      alert(`Loan approved successfully!`);
+      // Refresh the table to show updated state (e.g, APPROVED)
+      fetchMambuData();
+    } catch (error) {
+      console.error(`Error approving loan: ${error.message}`);
+      // Re-enable button on error
+      buttonElement.disabled = false;
+      buttonElement.textContent = "Approve";
+    }
+  }
+
+  // --- Function to fetch data from API via Proxy ---
+  async function fetchMambuData() {
+    loadingMessage.style.display = "block";
+    errorMessage.style.display = "none";
+    try {
+      const requestBody = {
+        filterCriteria: [
+          {
+            field: "_fundingsource.Source_Account",
+            operator: "EQUALS_CASE_SENSITIVE",
+            value: FUNDING_ACCOUNT_ID,
+          },
+        ],
+        sortingCriteria: {
+          field: "id",
+          order: "ASC",
+        },
+      };
+      const response = await fetch(PROXY_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+      if (!response.ok) {
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          errorData = { message: "Could not parse error response from proxy." };
+        }
+        throw new Error(
+          `Proxy error! Status: ${response.status} - ${errorData.error || errorData.message || response.statusText}`
+        );
+      }
+
+      // Expecting an object with 'loans' array and 'depositAccountBalance'
+      const combinedData = await response.json();
+      const loans = combinedData.loans;
+      const depositAccountBalance = combinedData.depositAccountBalance;
+
+      // <--- Get the deposit account balance
+      console.log("Combined Data received from Proxy:", combinedData);
+
+      // --- Populate Remaining Balance (top of page) ---
+      if (depositAccountBalance !== undefined && depositAccountBalance !== null) {
+        remainingBalanceElement.textContent = formatCurrency(depositAccountBalance);
+        // <--- Use deposit account balance
+      } else {
+        remainingBalanceElement.textContent = "$ N/A";
+      }
+
+      // --- Populate Loan Details Table ---
+      loanDetailsTableBody.innerHTML = ""; // Clear existing rows
+      // Clear existing rows
+      if (loans && Array.isArray(loans) && loans.length > 0) {
+        const tableHead = document.querySelector(".loan-details-table thead tr");
+        tableHead.innerHTML = `                     
+        <th>Disbursement Date</th>                     
+        <th>Funded Loan ID</th>                     
+        <th>Product Type</th>                     
+        <th>Customer Name</th>                     
+        <th>Customer ID</th>                     
+        <th>Account State</th>                     
+        <th>Loan Amount</th>                     
+        <th>Total Disbursed</th>                     
+        <th>Remaining to Disburse</th>                     
+        <th>Loan Principal Balance</th>                     
+        <th>Total Principal Paid</th>                 
+        `;
+
+        loans.forEach((loan) => {
+          const row = document.createElement("tr");
+
+          // --- MAPPING API RESPONSE TO SCREEN FIELDS ---
+          const disbursementDate = loan.disbursementDetails?.disbursementDate || "Not Disbursed";
+          const fundedLoanId = loan.id || "N/A";
+          const productType = loan.productDetails?.name || "N/A";
+
+          // Using clientDetails from the enriched loan object
+          const customerName = (loan.clientDetails?.firstName || "") + " " + (loan.clientDetails?.lastName || "");
+          const customerId = loan.clientDetails?.id || "N/A";
+          const accountState = loan.accountState || "N/A";
+          const loanAmount = loan.loanAmount || 0;
+          const totalDisbursed = loan.totalDisbursed || 0; // Use the total disbursed calculated by the server
+          const remainingToDisburse = loan.loanAmount - loan.totalDisbursed || 0;
+          const loanPrincipalBalance = loan.balances.principalBalance || 0;
+          const totalPrincipalPaid = loan.balances.principalPaid || 0;
+
+          // Construct the Mambu native screen URL for Loan
+          // Make sure loan.encodedKey is available and trimmed in the loan object from the server
+          const mambuLoanUrl = `${MAMBU_NATIVE_BASE_URL}loanaccount.id=${loan.encodedKey.trim()}`;
+
+          // Construct the Mambut native screen URL for Client
+          // Ensure loan.accountHolderKey (which is the encodedKey for the client) is available
+          const mambuClientUrl = `${MAMBU_NATIVE_BASE_URL}client.id=${loan.accountHolderKey.trim()}.type=indiv`;
+
+          // --- Conditional Approval Button ---
+          let approveButtonHtml = "";
+          if (loan.accountState === "PENDING_APPROVAL") {
+            approveButtonHtml = `
+            <br>
+            <button class="approve-loan-button" data-loan-encoded-key="${loan.encodedKey.trim()}"
+                    style="background-color: #339933; color: white; border: none;
+                    padding: 5px 10px; cursor: pointer; border-radio: 3px;
+                    margin-top: 5px; font-size: 0.9em;">
+              Approve
+              </button>
+              `;
+          }
+
+          row.innerHTML = `                         
+          <td>${disbursementDate}</td>                         
+          <td><a href="${mambuLoanUrl}" target ="_blank" rel="noopener noreferrer">${fundedLoanId}</a></td>                        
+          <td>${productType}</td>                         
+          <td>${customerName.trim() || "N/A"}</td>                         
+          <td><a href="${mambuClientUrl}" target ="_blank" rel="noopener noreferrer">${customerId}</a></td>                        
+          <td>${accountState}
+              ${approveButtonHtml}
+          </td>                         
+          <td>${formatCurrency(loanAmount)}</td>                         
+          <td>${formatCurrency(totalDisbursed)}</td>                         
+          <td>${formatCurrency(remainingToDisburse)}</td>                         
+          <td>${formatCurrency(loanPrincipalBalance)}</td>                         
+          <td>${formatCurrency(totalPrincipalPaid)}</td>                     `;
+          loanDetailsTableBody.appendChild(row);
+        });
+
+        // --- Event Delegation for Approve Buttons ---
+        // Attach a single event listening to the table body (more efficient for dynamic content)
+        loanDetailsTableBody.querySelectorAll(".approve-loan-button").forEach((button) => {
+          button.addEventListener("click", (event) => {
+            const loanEncodedKey = event.target.dataset.loanEncodedKey;
+            handleApproveLoan(loanEncodedKey, event.target);
+          });
+        });
+      } else {
+        // Colspan adjusted back to 11
+        const noDataRow = document.createElement("tr");
+        noDataRow.innerHTML = `<td colspan="11" style="text-align: center;">No loan details found for this funding source.</td>`;
+        loanDetailsTableBody.appendChild(noDataRow);
+      }
+    } catch (error) {
+      console.error("Error fetching data via proxy:", error);
+      errorMessage.textContent = `Failed to load data: ${error.message}. Check console for details.`;
+      errorMessage.style.display = "block";
+      remainingBalanceElement.textContent = "$ ERROR";
+      // Colspan adjusted back to 11
+      loanDetailsTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: red;">Error loading loan details.</td></tr>`;
+    } finally {
+      loadingMessage.style.display = "none";
+    }
+  }
+  fetchMambuData();
 });
