@@ -1,46 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Funding Details</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <div class="funding-section-container">
-        <div class="tab-content active">
-            <div class="remaining-balance-container">
-                <p class="remaining-balance-label">REMAINING BALANCE</p>
-                <p class="remaining-balance-amount" id="remainingBalance">$ 0.00</p>
-            </div>
-
-            <div class="table-responsive">
-                <table class="loan-details-table">
-                    <thead>
-                        <tr>
-                            <th>Disbursement Date</th>
-                            <th>Funded Loan ID</th>
-                            <th>Product Type</th>
-                            <th>Customer Name</th>
-                            <th>Customer ID</th>
-                            <th>Account State</th>
-                            <th>Loan Amount</th>
-                            <th>Total Disbursed</th>
-                            <th>Remaining to Disburse</th>
-                            <th>Loan Principal Balance</th>
-                            <th>Total Principal Paid</th>
-                        </tr>
-                    </thead>
-                    <tbody id="loanDetailsTableBody">
-                        </tbody>
-                </table>
-            </div>
-            <p id="errorMessage" style="color: red; display: none;">Failed to load data. Please try again later.</p>
-            <p id="loadingMessage">Loading data...</p>
+      <div class="tab-content active">
+        <div class="remaining-balance-container">
+          <p class="remaining-balance-label">FUNDING AVAILABLE BALANCE</p>
+          <p class="remaining-balance-amount" id="remainingBalance">$ 0.00</p>
         </div>
+        <div class="table-responsive">
+          <table class="loan-details-table">
+            <thead>
+              <tr>
+                <th>Disbursement Date</th>
+                <th>Funded Loan ID</th>
+                <th>Product Type</th>
+                <th>Customer Name</th>
+                <th>Customer ID</th>
+                <th>Account State</th>
+                <th>Loan Amount</th>
+                <th>Total Disbursed</th>
+                <th>Remaining to Disburse</th>
+                <th>Loan Principal Balance</th>
+                <th>Total Principal Paid</th>
+              </tr>
+            </thead>
+            <tbody id="loanDetailsTableBody"></tbody>
+          </table>
+        </div>
+        <p id="errorMessage" style="color: red; display: none">Failed to load data. Please try again later.</p>
+        <p id="loadingMessage">Loading data...</p>
+      </div>
     </div>
-
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
