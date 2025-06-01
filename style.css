@@ -1,95 +1,71 @@
 /* Basic Resets & Body Styles */
-html, body {
-    height: 100%; /* Make HTML and Body take full viewport height */
-    width: 100%;  /* Make HTML and Body take full viewport width */
-    margin: 0;    /* Remove default body margins */
-    padding: 0;   /* Remove default body padding */
-    overflow: hidden; /* Prevent body scrollbars, allowing the container or its children to handle scrolling */
-    background-color: #f2f2f2; /* Light grey background */
-    color: #333;
-    font-family: Arial, sans-serif;
-}
-
-/* Universal Box Sizing for easier layout */
+html,
+body {
+  height: 100%; /* Make HTML and Body take full viewport height */
+  width: 100%; /* Make HTML and Body take full viewport width */
+  margin: 0; /* Remove default body margins */
+  padding: 0; /* Remove default body padding */
+  overflow: hidden; /* Prevent body scrollbars, allowing the container or its children to handle scrolling */
+  background-color: #f2f2f2; /* Light grey background */
+  color: #333;
+  font-family: Arial, sans-serif;
+} /* Universal Box Sizing for easier layout */
 * {
-    box-sizing: border-box;
-}
-
-/* Container for the extracted section, now filling the entire viewport */
+  box-sizing: border-box;
+} /* Container for the extracted section, now filling the entire viewport */
 .funding-section-container {
-    background-color: #fff; /* White background for the main content area */
-    height: 100%;           /* Make it fill the parent's height (which is 100vh) */
-    width: 100%;            /* Make it fill the parent's width (which is 100vw) */
-    margin: 0;              /* Remove margins to ensure it spans full width/height */
-    border-radius: 0;       /* Remove border-radius to blend with edges */
-    box-shadow: none;       /* Remove box-shadow to blend with edges */
-    padding: 20px;          /* Maintain internal padding for content spacing */
-
-    /* IMPORTANT: Handle vertical scrolling for the main content if it overflows */
-    overflow-y: auto;
-    /* Removed overflow: auto; (or overflow-x) from here because .table-responsive will handle horizontal table scrolling */
-}
-
-
-/* Remaining Balance */
+  background-color: #fff; /* White background for the main content area */
+  height: 100%; /* Make it fill the parent's height (which is 100vh) */
+  width: 100%; /* Make it fill the parent's width (which is 100vw) */
+  margin: 0; /* Remove margins to ensure it spans full width/height */
+  border-radius: 0; /* Remove border-radius to blend with edges */
+  box-shadow: none; /* Remove box-shadow to blend with edges */
+  padding: 20px; /* Maintain internal padding for content spacing */ /* IMPORTANT: Handle vertical scrolling for the main content if it overflows */
+  overflow-y: auto; /* Removed overflow: auto; (or overflow-x) from here because .table-responsive will handle horizontal table scrolling */
+} /* Funding Available Balance */
 .remaining-balance-container {
-    text-align: center;
-    margin-top: 30px;
-    margin-bottom: 40px; /* Add some space below the balance before the table */
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 40px; /* Add some space below the balance before the table */
 }
-
 .remaining-balance-label {
-    font-size: 12px;
-    color: #888;
-    margin-bottom: 5px;
+  font-size: 24px;
+  color: #888;
+  margin-bottom: 5px;
 }
-
 .remaining-balance-amount {
-    font-size: 32px;
-    font-weight: bold;
-    color: #339933; /* Green color for balance */
-}
-
-/* NEW CSS: Responsive Table Wrapper */
+  font-size: 32px;
+  font-weight: bold;
+  color: #339933; /* Green color for balance */
+} /* NEW CSS: Responsive Table Wrapper */
 .table-responsive {
-    /* This makes the content inside (your table) scroll horizontally if it's wider than this div */
-    overflow-x: auto;
-    /* Add some margin if needed, e.g., margin-bottom: 20px; */
-}
-
-
-/* Loan Details Table */
+  /* This makes the content inside (your table) scroll horizontally if it's wider than this div */
+  overflow-x: auto; /* Add some margin if needed, e.g., margin-bottom: 20px; */
+} /* Loan Details Table */
 .loan-details-table {
-    /* The table itself should be as wide as its content needs to be,
-       and the .table-responsive parent will handle the horizontal scroll. */
-    width: 100%; /* Still useful to make it try to fill space, but content can push it wider */
-    border-collapse: collapse;
+  /* The table itself should be as wide as its content needs to be,       and the .table-responsive parent will handle the horizontal scroll. */
+  width: 100%; /* Still useful to make it try to fill space, but content can push it wider */
+  border-collapse: collapse;
 }
-
 .loan-details-table th,
 .loan-details-table td {
-    border: 1px solid #ddd;
-    padding: 10px 12px;
-    text-align: left;
-    font-size: 13px;
-    white-space: nowrap; /* Keep this to prevent text wrapping within cells, forcing table wider */
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 13px;
+  white-space: nowrap; /* Keep this to prevent text wrapping within cells, forcing table wider */
 }
-
 .loan-details-table th {
-    background-color: #f8f8f8;
-    font-weight: bold;
-    color: #666;
+  background-color: #f8f8f8;
+  font-weight: bold;
+  color: #666;
 }
-
 .loan-details-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+  background-color: #f9f9f9;
 }
-
 .loan-details-table tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
-/* Ensure the main content block is visible */
+  background-color: #f1f1f1;
+} /* Ensure the main content block is visible */
 .tab-content.active {
-    display: block;
+  display: block;
 }
