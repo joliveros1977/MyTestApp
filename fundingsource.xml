@@ -6,6 +6,6 @@
      <extensionpoint>
           <location>DEPOSIT_ACCOUNT_VIEW</location>
           <label>Funding</label>
-          <url>http://127.0.0.1:5500/</url>
+          <url>https://joliveros1977.github.io/MyTestApp/</url>
      </extensionpoint>
 </app>
