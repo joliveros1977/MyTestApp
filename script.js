@@ -5,8 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const errorMessage = document.getElementById("errorMessage");
 
   // --- Configuration for Proxy API Request ---
-  const PROXY_API_URL = "http://localhost:3000/api/mambu-loans-search";
-  const PROXY_CHANGE_STATE_URL = "http://localhost:3000/api/mambu-loan-change-state"; // Proxy API for changing loan state
+  const PROXY_API_URL = "https://ff35-2600-1004-a033-9bf1-18e0-5f8e-c9e8-f4ca.ngrok-free.app/api/mambu-loans-search"; // "http://localhost:3000/api/mambu-loans-search";
+  const PROXY_CHANGE_STATE_URL = "https://ff35-2600-1004-a033-9bf1-18e0-5f8e-c9e8-f4ca.ngrok-free.app/api/mambu-loan-change-state";
+  //"http://localhost:3000/api/mambu-loan-change-state"; // Proxy API for changing loan state
   const FUNDING_ACCOUNT_ID = "cdb-funding";
 
   // --- Mambu Base URL for Native Screen ---
