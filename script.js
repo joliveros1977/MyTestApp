@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Configuration for Proxy API Request ---
   const PROXY_API_URL = "https://ff35-2600-1004-a033-9bf1-18e0-5f8e-c9e8-f4ca.ngrok-free.app";
-  const PROXY_CHANGE_STATE_URL = "https://ff35-2600-1004-a033-9bf1-18e0-5f8e-c9e8-f4ca.ngrok-free.app/api/mambu-loan-change-state"; // Proxy API for changing loan state
+  const PROXY_CHANGE_STATE_URL = "https://ff35-2600-1004-a033-9bf1-18e0-5f8e-c9e8-f4ca.ngrok-free.app; // Proxy API for changing loan state
   const FUNDING_ACCOUNT_ID = "cdb-funding";
 
   // --- Mambu Base URL for Native Screen ---
