@@ -1,0 +1,11 @@
+<app>
+     <id>funding2025</id>
+     <name>Funding Sources</name>
+     <provider>GitHub</provider>
+     <description>An app to view funded loans</description>
+     <extensionpoint>
+          <location>DEPOSIT_ACCOUNT_VIEW</location>
+          <label>Funding</label>
+          <url>https://joliveros1977.github.io/MyTestApp/</url>
+     </extensionpoint>
+</app>
