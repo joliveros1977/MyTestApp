@@ -7,6 +7,6 @@
      <extensionpoint>
           <location>DEPOSIT_ACCOUNT_VIEW</location>
           <label>Funding</label>
-          <url>https://joliveros1977.github.io/MyTestApp/</url>
+          <url>http://localhost:3000/fundingapp</url>
      </extensionpoint>
 </app>
